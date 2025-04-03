@@ -1,0 +1,100 @@
+@startuml
+
+'1 - É necessário ter a informação de qual curso o aluno está cursando;
+'2 - O curso é estruturado em fases e cada fase tem um rol de disciplinas;
+'3 - A disciplina pode ser lecionada por 1 ou até 4 professores;
+'4 - Controle alunos e frequências.
+'5 - Como existe a possibilidade de mais de um professor por disciplina é necessário saber qual professor
+'    fez o registro de frequência ou avaliação;
+'6 - É importante saber quais disciplinas já foram ofertadas.
+'7 - Um aluno pode se matricular em disciplinas de fases diferentes, não é necessário verificar pré-requisitos;
+'8 - Saber a situação do aluno em uma determinada disciplina (aprovado, reprovado, reprovado por falta)
+'9 - Elaborar Diagrama de Classe, especificando os tipos de relações e multiplicidades entre os objetos;
+'10 - Utilizar Injeção de Dependência para realizar a persistência nos seguintes tipos MySQL, JSON e XML;
+'11 - Criar um main onde o usuário possa escolher qual tipo utilizar;
+'12 - Neste mesmo main criar uma sequência de passos para testar a persistência completa do sistema CRUD.
+'13 - Use o projeto no anexo como modelo para a sua implementação;
+
+skinparam classAttributeIconSize 0
+
+class Curso {
+    - idCurso : int
+    # fases : ArrayList<Fase>
+    - nomeCurso : String
+}
+
+class Fase {
+    - idFase : int
+    # disciplinas : ArrayList<Disciplina>
+    - numeroFase : int 
+}
+
+class Disciplina {
+    - idDisciplina : int
+    # professores : ArrayList<Professor>
+    - nomeDisciplina : String
+}
+
+class Professor {
+    - idProfessor : int
+    - nomeProfessor : String
+    - especialidade : String
+}
+
+class Aluno {
+    - idAluno : int
+    # disciplinasRelacionadas : ArrayList<DisciplinaCurso> 
+    # curso : Curso
+    - nomeAluno : String
+}
+
+class DisciplinaCurso {
+    # disciplina : Disciplina
+    - situacao : String
+    - anoSemestre : String
+    - registroAcademico ArrayList<RegistroAcademico>
+    - avaliacoes : ArrayList<Avaliacao>
+}
+
+class RegistroAcademico {
+    # presencaAluno : PresencaAluno
+    - data : Date
+    - numeroAulas : int
+    - professor : Professor
+}
+
+class PresencaAluno {
+    # aluno : Aluno
+    - numeroPresencas : int
+}
+
+class Avaliacao {
+    - idAvaliacao : int
+    # registroAvaliacao : RegistroAvaliacao
+    - dataAvaliacao : Date
+    - numeracaoProva : int
+    - professor : Professor
+}
+
+class RegistroAvaliacao {
+    # aluno : Aluno
+    - nota : float
+}
+
+Avaliacao "1" *-- "1" RegistroAvaliacao
+RegistroAvaliacao "1..*" *-- "1..*" Aluno
+RegistroAcademico "1" *-- "1" Professor : Feita por
+RegistroAcademico "1" *-- "1" PresencaAluno
+PresencaAluno "1" *-- "1" Aluno
+Avaliacao "1" *-- "1" Professor
+Curso "1" *-- "1..*" Fase  : contém
+Fase "1" *-- "1..*" Disciplina : possui
+Disciplina "1" *-- "1..4" Professor : é lecionada por
+DisciplinaCurso "1" *-- "1..*" RegistroAcademico : possui
+DisciplinaCurso "1" *-- "1..*" Avaliacao : possui
+Aluno "1..*" *-- "1..*" DisciplinaCurso
+Aluno "1..*" *-- "1" Curso : faz parte
+DisciplinaCurso "1" *-- "1" Disciplina
+
+
+@enduml
